@@ -117,6 +117,11 @@ namespace egret.web {
                 }
             }
             displayObject.$cacheDirty = false;
+            // if (displayObject.stage) {
+            //     const rect = egret.Rectangle.create();
+            //     rect.setTo(0, 0, displayObject.stage.stageWidth, displayObject.stage.stageHeight);
+            //     egret.Rectangle.release(rect);
+            // }
             if (node) {
                 drawCalls++;
                 buffer.$offsetX = offsetX;
@@ -913,9 +918,9 @@ namespace egret.web {
                         buffer.$offsetY = saveOffsetY + anchorY - (tb.measureHeight + (tb.stroke2 ? tb.canvasHeightOffset : 0)) / 2;
                         page = tb.line.page;
                         buffer.context.drawTexture(page.webGLTexture,
-                            tb.u, tb.v, tb.contentWidth, tb.contentHeight, 
+                            tb.u, tb.v, tb.contentWidth, tb.contentHeight,
                             0, 0, tb.contentWidth, tb.contentHeight,
-                             page.pageWidth, page.pageHeight);
+                            page.pageWidth, page.pageHeight);
 
                         buffer.$offsetX += (tb.contentWidth - tb.canvasWidthOffset);
                     }
