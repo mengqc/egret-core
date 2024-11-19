@@ -395,5 +395,7 @@
       }
     ]
   },
-  "dependencies": {}
+  "devDependencies": {
+    "typescript-plus": "^3.1.5"
+  }
 }
