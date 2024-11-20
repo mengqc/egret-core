@@ -167,40 +167,39 @@ namespace egret.web {
                 }
             }
             displayObject.$cacheDirty = false;
+
+            // let isDisplay = true;
+            // if (displayObject.stage) {
+            //     const displayRect = Rectangle.create();
+            //     displayRect.setTo(0, 0, displayObject.stage.stageWidth, displayObject.stage.stageHeight);
+            //     const gRect = Rectangle.create();
+            //     displayObject.getTransformedBounds(displayObject.stage, gRect);
+            //     isDisplay = displayRect.intersects(gRect);
+            //     Rectangle.release(gRect);
+            //     Rectangle.release(displayRect);
+            // }
             if (node) {
-                // drawCalls++;
+                drawCalls++;
                 buffer.$offsetX = offsetX;
                 buffer.$offsetY = offsetY;
                 switch (node.type) {
                     case sys.RenderNodeType.BitmapNode:
-                        if (this.checkDisplayInScreen(<sys.BitmapNode>node, buffer, offsetX, offsetY)) {
-                            this.renderBitmap(<sys.BitmapNode>node, buffer);
-                            drawCalls++;
-                        }
+                        this.renderBitmap(<sys.BitmapNode>node, buffer);
                         break;
                     case sys.RenderNodeType.TextNode:
                         this.renderText(<sys.TextNode>node, buffer);
-                        drawCalls++;
                         break;
                     case sys.RenderNodeType.GraphicsNode:
                         this.renderGraphics(<sys.GraphicsNode>node, buffer);
-                        drawCalls++;
                         break;
                     case sys.RenderNodeType.GroupNode:
                         this.renderGroup(<sys.GroupNode>node, buffer);
-                        drawCalls++;
                         break;
                     case sys.RenderNodeType.MeshNode:
-                        if (this.checkDisplayInScreen(<sys.MeshNode>node, buffer, offsetX, offsetY)) {
-                            this.renderMesh(<sys.MeshNode>node, buffer);
-                            drawCalls++;
-                        }
+                        this.renderMesh(<sys.MeshNode>node, buffer);
                         break;
                     case sys.RenderNodeType.NormalBitmapNode:
-                        if (this.checkDisplayInScreen(<sys.NormalBitmapNode>node, buffer, offsetX, offsetY)) {
-                            this.renderNormalBitmap(<sys.NormalBitmapNode>node, buffer);
-                            drawCalls++;
-                        }
+                        this.renderNormalBitmap(<sys.NormalBitmapNode>node, buffer);
                         break;
                 }
                 buffer.$offsetX = 0;
