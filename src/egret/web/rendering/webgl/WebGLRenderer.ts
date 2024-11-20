@@ -92,6 +92,56 @@ namespace egret.web {
             return drawCall;
         }
 
+        private checkDisplayInScreen(node: sys.BitmapNode | sys.NormalBitmapNode | sys.MeshNode, buffer: WebGLRenderBuffer, offsetX: number, offsetY: number) {
+            const min = Point.create(0, 0);
+            const max = Point.create(0, 0);
+            const gMatrix = Matrix.create();
+            const itemMatrix = Matrix.create();
+            const displayRect = Rectangle.create();
+            displayRect.setTo(0, 0, buffer.width, buffer.height);
+            gMatrix.copyFrom(buffer.globalMatrix);
+            gMatrix.append(1, 0, 0, 1, offsetX, offsetY);
+
+            if (node['matrix']) {
+                itemMatrix.copyFrom(node['matrix']);
+                gMatrix.append(itemMatrix.a, itemMatrix.b, itemMatrix.c, itemMatrix.d, itemMatrix.tx, itemMatrix.ty);
+            }
+            let imageWidth = node.imageWidth;
+            let imageHeight = node.imageHeight;
+            if (node.drawData && node.drawData.length > 0) {
+                const length = node.drawData.length;
+                const data = node.drawData;
+                imageWidth = 0;
+                imageHeight = 0;
+                let pos = 0;
+                while (pos < length) {
+                    const sourceX = data[pos++];
+                    const sourceY = data[pos++];
+                    const sourceWidth = data[pos++];
+                    const sourceHeight = data[pos++];
+                    const destX = data[pos++];
+                    const destY = data[pos++];
+                    const destWidth = data[pos++];
+                    const destHeight = data[pos++];
+                    imageWidth = Math.max(destX + destWidth, imageWidth);
+                    imageHeight = Math.max(destY + destHeight, imageHeight);
+                }
+            }
+
+            gMatrix.transformPoint(0, 0, min);
+            gMatrix.transformPoint(imageWidth, imageHeight, max);
+            const itemRect = Rectangle.create();
+            itemRect.setTo(Math.min(min.x, max.x), Math.min(min.y, max.y), Math.abs(max.x - min.x), Math.abs(max.y - min.y));
+            const isDisplay = displayRect.intersects(itemRect);
+            Point.release(min);
+            Point.release(max);
+            Matrix.release(gMatrix);
+            Matrix.release(itemMatrix);
+            Rectangle.release(itemRect);
+            Rectangle.release(displayRect);
+            return isDisplay;
+        }
+
         /**
          * @private
          * 绘制一个显示对象
@@ -117,33 +167,40 @@ namespace egret.web {
                 }
             }
             displayObject.$cacheDirty = false;
-            // if (displayObject.stage) {
-            //     const rect = egret.Rectangle.create();
-            //     rect.setTo(0, 0, displayObject.stage.stageWidth, displayObject.stage.stageHeight);
-            //     egret.Rectangle.release(rect);
-            // }
             if (node) {
-                drawCalls++;
+                // drawCalls++;
                 buffer.$offsetX = offsetX;
                 buffer.$offsetY = offsetY;
                 switch (node.type) {
                     case sys.RenderNodeType.BitmapNode:
-                        this.renderBitmap(<sys.BitmapNode>node, buffer);
+                        if (this.checkDisplayInScreen(<sys.BitmapNode>node, buffer, offsetX, offsetY)) {
+                            this.renderBitmap(<sys.BitmapNode>node, buffer);
+                            drawCalls++;
+                        }
                         break;
                     case sys.RenderNodeType.TextNode:
                         this.renderText(<sys.TextNode>node, buffer);
+                        drawCalls++;
                         break;
                     case sys.RenderNodeType.GraphicsNode:
                         this.renderGraphics(<sys.GraphicsNode>node, buffer);
+                        drawCalls++;
                         break;
                     case sys.RenderNodeType.GroupNode:
                         this.renderGroup(<sys.GroupNode>node, buffer);
+                        drawCalls++;
                         break;
                     case sys.RenderNodeType.MeshNode:
-                        this.renderMesh(<sys.MeshNode>node, buffer);
+                        if (this.checkDisplayInScreen(<sys.MeshNode>node, buffer, offsetX, offsetY)) {
+                            this.renderMesh(<sys.MeshNode>node, buffer);
+                            drawCalls++;
+                        }
                         break;
                     case sys.RenderNodeType.NormalBitmapNode:
-                        this.renderNormalBitmap(<sys.NormalBitmapNode>node, buffer);
+                        if (this.checkDisplayInScreen(<sys.NormalBitmapNode>node, buffer, offsetX, offsetY)) {
+                            this.renderNormalBitmap(<sys.NormalBitmapNode>node, buffer);
+                            drawCalls++;
+                        }
                         break;
                 }
                 buffer.$offsetX = 0;

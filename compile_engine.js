@@ -33,7 +33,6 @@ function compile(srcPath, outFile, isPublish, options, exSrcList, filterFunc) {
     if (compilerHost.messages && compilerHost.messages.length > 0) {
         global.exitCode = 1;
     }
-    console.log('Compile Complete');
 }
 
 function clear(destPath) {
@@ -41,22 +40,12 @@ function clear(destPath) {
     fs.rmSync(destPath, { recursive: true });
 }
 
+function minify(srcFile, outFile) {
+    utils.minify(srcFile, outFile);
+}
 
-const isPublish = true;
-const srcPath = './src/egret/';
-const outFile = 'dist/egret/egret.js';
-
-
-clear('./dist/egret');
-compile(srcPath, outFile, isPublish, { declaration: true }, null, (fileName, index, array) => {
-    if (fileName.indexOf('WebGLUtils') > -1) return true;
-    if (fileName.indexOf('web/') > -1) return false;
-    return true;
-});
-utils.minify(outFile, 'dist/egret/egret.min.js');
-
-compile(srcPath, 'dist/egret/egret.web.js', isPublish, { declaration: false }, ['dist/egret/egret.d.ts'], (fileName, index, array) => {
-    if (fileName.indexOf('web/') > -1) return true;
-    return false;
-});
-utils.minify(outFile, 'dist/egret/egret.web.min.js');
+module.exports = {
+    compile: compile,
+    clear: clear,
+    minify: minify,
+}
