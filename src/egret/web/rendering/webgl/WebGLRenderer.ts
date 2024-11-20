@@ -157,27 +157,15 @@ namespace egret.web {
                     drawCalls += displayList.drawToSurface();
                 }
                 node = displayList.$renderNode;
-            }
-            else {
+            } else {
                 if (displayObject.$renderDirty) {
                     node = displayObject.$getRenderNode();
-                }
-                else {
+                } else {
                     node = displayObject.$renderNode;
                 }
             }
             displayObject.$cacheDirty = false;
 
-            // let isDisplay = true;
-            // if (displayObject.stage) {
-            //     const displayRect = Rectangle.create();
-            //     displayRect.setTo(0, 0, displayObject.stage.stageWidth, displayObject.stage.stageHeight);
-            //     const gRect = Rectangle.create();
-            //     displayObject.getTransformedBounds(displayObject.stage, gRect);
-            //     isDisplay = displayRect.intersects(gRect);
-            //     Rectangle.release(gRect);
-            //     Rectangle.release(displayRect);
-            // }
             if (node) {
                 drawCalls++;
                 buffer.$offsetX = offsetX;
